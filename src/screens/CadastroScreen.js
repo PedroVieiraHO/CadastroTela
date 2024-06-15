@@ -1,23 +1,58 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
+import Api from "../../Api";
 
 const CadastroScreen = () => {
+  const [id, setId] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleRegister = () => {
+  async function handleRegister  () {
     console.log('Nome:', name);
     console.log('Email:', email);
     console.log('Senha:', password);
+
+   const response = await Api.post('/usuario', {
+    id: id,
+    name: name, 
+    email: email,
+    password: password
+   })
+
+   .then(response => console.log(response.data))
 
     alert("Cadastro sucedido!")
 
   };
 
+  async function handleDelete () {
+    await Api.delete(`/usuario/${id}`)
+
+    alert("Usuário deletado!")
+  };
+
+   async function handleUpdate (){
+    const response = await Api.put(`/usuario/${id}`,{
+      name: name,
+      email: email,
+      password: password
+    })
+    .then(response => console.log(response.data))
+
+    alert("Usuário atualizado!")
+   }
+
   return (
+
     <View style={styles.container}>
       <Text style={styles.title}>Cadastro</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="ID do Usuário"
+        value={id}
+        onChangeText={setId}
+      />
       <TextInput
         style={styles.input}
         placeholder="Nome"
@@ -38,7 +73,16 @@ const CadastroScreen = () => {
         onChangeText={setPassword}
         secureTextEntry
       />
-      <Button title="Cadastrar" onPress={handleRegister} />
+       <View style={styles.buttonContainer}>
+        <Button title="Cadastrar" onPress={handleRegister} />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button title="Deletar Usuário" onPress={handleDelete} color="red" />
+      </View>
+      <View style={styles.buttonContainer}>
+        <Button title="Atualizar Usuário" onPress={handleUpdate} color="orange" />
+      </View>
+
     </View>
   );
 };
@@ -63,6 +107,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 8,
   },
+
+  buttonContainer: {
+    marginVertical: 8,
+  },
+  
 });
 
 export default CadastroScreen;
